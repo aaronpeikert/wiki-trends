@@ -1,0 +1,66 @@
+---
+title: "Wikipedia Trends"
+description: |
+  This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.
+author:
+  - name: Aaron Peikert
+    url: https://github.com/aaronpeikert
+date: "`r Sys.Date()`"
+output: radix::radix_article
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+if(!requireNamespace("pacman"))install.packages("pacman")
+pacman::p_load("fs",
+               "tidyverse",
+               "psych",
+               "lubridate",
+               "here",
+               "tsibble",
+               "pdc",
+               "cowplot",
+               "patchwork",
+               "ragg")
+pacman::p_load_gh("Ironholds/pageviews@d32c629")
+```
+
+```{r}
+dir_walk(here("R"), source)
+start <- ymd("2015-01-01")
+end <- ymd("2019-12-31")
+```
+
+```{r, context="server"}
+articles <- reactive(str_squish(flatten_chr(str_split(input$articles, ","))))
+views <- reactive(
+  get_articles(articles(), start, end) %>%
+    remove_outliers() %>%
+    extract_trend() %>%
+    add_dates() %>%
+    extract_wday_trend() %>%
+    extract_year_trend() %>%
+    remove_pattern() %>%
+    add_cluster(nclust = input$nclust)
+)
+```
+
+```{r}
+height <- reactive(250 * input$nclust)
+```
+
+```{r eruptions, echo=FALSE}
+sliderInput("nclust", "Number of clusters:", 3, min = 1, max = 6)
+shiny::textAreaInput("articles", "Articles:", "Alcohol, Nicotine, Caffeine, Cannabis, Methamphetamine, Cocaine, Heroin, Ecstasy, LSD, Xanax, Fentanyl, Percocet", "400px", "100px")
+```
+
+```{r, context="server", layout = "l-screen-inset"}
+output$final <- renderPlot({
+  plot_final(views())
+}, execOnResize = TRUE, width = 1200, height = 600)
+```
+
+```{r, layout = "l-screen-inset"}
+plotOutput("final")
+```
