@@ -61,6 +61,7 @@ add_dates <- function(views){
          wday = wday(date),
          doy = yday(date))
 }
+
 #----extract-wday-trend----
 extract_wday_trend <- function(views) {
   views %>%
