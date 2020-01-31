@@ -7,26 +7,13 @@ author:
     url: https://github.com/aaronpeikert
 date: "`r Sys.Date()`"
 output: radix::radix_article
-runtime: shiny_prerendered
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library("fs")
-library("tidyverse")
-library("psych")
-library("lubridate")
-library("here")
-library("tsibble")
-library("pdc")
-library("cowplot")
-library("patchwork")
-library("pageviews")
-dir_walk(here("R"), source)
-dir_walk(here("R"), knitr::read_chunk)
-```
-
-```{r packages2, eval=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      layout = "l-page",
+                      dpi = 300)
 if(!requireNamespace("pacman"))install.packages("pacman")
 pacman::p_load("fs",
                "tidyverse",
@@ -39,49 +26,11 @@ pacman::p_load("fs",
                "patchwork",
                "ragg")
 pacman::p_load_gh("Ironholds/pageviews@d32c629")
+dir_walk(here("R"), source)
+dir_walk(here("R"), knitr::read_chunk)
 ```
 
-```{r, context="server"}
-articles <- reactive(str_squish(flatten_chr(str_split(input$articles, ","))))
-start <- reactive(ymd(input$start))
-end <- reactive(ymd(input$end))
-```
-
-<p align="center">
-
-```{r, layout = "l-screen-inset", echo=FALSE}
-plotOutput("final")
-```
-
-<p/>
-
-<p style="padding: 0 0 200px 0"></p>
-
-```{r, context="server"}
-views <- reactive(
-  get_articles(articles(), start(), end()) %>%
-    remove_outliers() %>%
-    extract_trend() %>%
-    add_dates() %>%
-    extract_wday_trend() %>%
-    extract_year_trend() %>%
-    remove_pattern() %>%
-    add_cluster(nclust = input$nclust)
-)
-```
-
-```{r render, context="server", layout = "l-screen-inset", height = "600px"}
-output$final <- renderPlot({
-  plot_final(views())
-}, execOnResize = TRUE, width = 1800, height = 600)
-```
-
-```{r input, echo=FALSE}
-sliderInput("nclust", "Number of clusters:", 3, min = 1, max = 6)
-textAreaInput("articles", "Articles:", "Alcohol, Nicotine, Caffeine, Cannabis, Methamphetamine, Cocaine, Heroin, Ecstasy, Fentanyl", "400px", "100px")
-textInput("start", "Start date:", "2015-01-01")
-textInput("end", "End date:", "2019-12-31")
-```
+<iframe src="https://aaronpeikert.shinyapps.io/wiki-trends/" class="l-screen-inset" height="800px"></iframe>
 
 # Backround Story 
 
@@ -284,7 +233,7 @@ So the final Plot is:
 ```{r final-plot}
 ```
 
-```{r}
+```{r, layout = "l-screen-inset", fig.width = 16, fig.height = 9}
 plot_final(views)
 ```
 
