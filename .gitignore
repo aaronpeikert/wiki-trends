@@ -4,3 +4,5 @@
 .Ruserdata
 *.html
 rsconnect/
+/index_files/
+/index_cache/
