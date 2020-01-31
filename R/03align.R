@@ -29,7 +29,6 @@ prepare_polar <- function(left, right, datas) {
     ~ .x +
       remove_margin +
       remove_legend +
-      theme(axis.title.y = element_blank()) +
       scale_y_continuous(limits = polar_range) +
       labs(tag = .y)
   ))
@@ -37,16 +36,26 @@ prepare_polar <- function(left, right, datas) {
                                    remove_margin +
                                    remove_legend +
                                    remove_y_axis))
+  first_rights <- rights[[1]]
   last_rights <- rights[[length(rights)]]
   rights <- map(rights, ~ .x +
-                  theme(axis.title.x = element_blank()))
-  rights[[length(rights)]] <- last_rights
+                  theme(axis.text = element_blank(),
+                        axis.title = element_blank()))
+  rights[[1]] <- first_rights +
+    theme(axis.title = element_blank())
+  rights[[length(rights)]] <- last_rights +
+    theme(axis.text.x = element_blank())
   
+  first_lefts <- lefts[[1]] +
+    theme(axis.title = element_blank())
   last_lefts <- lefts[[length(lefts)]]
   lefts <- map(lefts, ~ .x +
-                 theme(axis.title.x = element_blank()))
-  lefts[[length(lefts)]] <- last_lefts
-  
+                 theme(axis.text = element_blank(),
+                       axis.title = element_blank()))
+  lefts[[1]] <- first_lefts
+  lefts[[length(lefts)]] <- last_lefts +
+    theme(axis.text = element_blank(),
+          axis.title.y = element_blank())
   list(lefts = lefts, rights = rights)
 }
 align_polar <- function(polar){
@@ -81,27 +90,40 @@ align_alltime <- function(plots, l, r){
 }
 
 #----color----
-get_color_order <- function(views){
+article_order <- function(views){
   views %>%
     group_by(cluster, article) %>%
     summarise(mean = mean(views_depattern_smooth, na.rm = TRUE)) %>% 
     arrange(cluster, desc(mean)) %>% 
-    .$article
+    select(cluster, article)
+}
+
+
+max_color_diff <- function(color, cluster, n = 100){
+  col2hue <- function(x)rgb2hsv(col2rgb(x))[1, ]
+  sshue <- function(colors, cluster){
+    colors <- tibble(colors, cluster, hue = col2hue(colors)) %>% 
+      group_by(cluster) %>%
+      summarise(sshue = var(hue))
+    mean(colors$sshue)
+  }
+  shuffle <- function(x)sample(x, length(x))
+  colors <- replicate(n, shuffle(color), simplify = FALSE)
+  colors[[which.max(map_dbl(colors, sshue, cluster))]]
 }
 
 add_colors <- function(plots, views){
-  color_order <- get_color_order(views)
-  color_standard <- scales::hue_pal()(length(color_order))
-  set.seed(1234)
-  color_standard <- sample(color_standard, length(color_standard))
-  names(color_standard) <- color_order
+  article_order <- article_order(views)
+  colors <- max_color_diff(scales::hue_pal()(length(article_order$article)),
+                           article_order$cluster)
+  names(colors) <- article_order$article
   add_layer(
     plots,
     ~ .x +
-      scale_color_manual(values = color_standard,
-                         breaks = color_order) +
-      scale_fill_manual(values = color_standard,
-                        breaks = color_order)
+      scale_color_manual(values = colors,
+                         breaks = article_order$article) +
+      scale_fill_manual(values = colors,
+                        breaks = article_order$article)
   )
 }
 
@@ -127,5 +149,13 @@ plot_final <- function(views){
   designs <- c(align_polar(plots$polar),
                align_alltime(plots$alltime, 3, 4))
   plots <- c(flatten(plots$polar), plots$alltime)
-  add_legend(plots, designs, views)
+  plots <- add_colors(plots, views)
+  add_legend(plots, designs, views) +
+    plot_annotation(title = "Wikipedia Trends",
+                    caption = "Polar plots (left) show averaged trends in standard deviation, while cartesian plots (right) represents the raw count (shaded area +/- 1SD smothed over ten days).\nTrends shown in plots to the left are removed from plots to the right.\nRows are created by clustering articles by similarity.",
+                    theme = theme(plot.caption = element_text(
+                      face = "plain",
+                      colour = "darkgrey",
+                      size = 10
+                    )))
 }

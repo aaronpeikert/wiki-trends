@@ -149,7 +149,8 @@ add_cluster <- function(views, nclust){
   )
   views %>% select(-starts_with("cluster")) %>% 
     left_join(cluster, by = "article") %>% 
-    mutate(views, article = str_c(cluster, "-", article))
+    mutate(views, article2 = article,
+           article = str_c(cluster, "-", article))
 }
 break_clusters <- function(views){
   arrange(nest(group_by(views, cluster)), cluster)$data

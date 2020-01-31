@@ -73,21 +73,20 @@ views <- reactive(
 ```{r render, context="server", layout = "l-screen-inset", height = "600px"}
 output$final <- renderPlot({
   plot_final(views())
-}, execOnResize = TRUE, width = 1200, height = 600)
+}, execOnResize = TRUE, width = 1800, height = 600)
 ```
 
 ```{r input, echo=FALSE}
 sliderInput("nclust", "Number of clusters:", 3, min = 1, max = 6)
-textAreaInput("articles", "Articles:", "Alcohol, Nicotine, Caffeine, Cannabis, Methamphetamine, Cocaine, Heroin, Ecstasy, LSD, Xanax, Fentanyl, Percocet", "400px", "100px")
+textAreaInput("articles", "Articles:", "Alcohol, Nicotine, Caffeine, Cannabis, Methamphetamine, Cocaine, Heroin, Ecstasy, Fentanyl", "400px", "100px")
 textInput("start", "Start date:", "2015-01-01")
 textInput("end", "End date:", "2019-12-31")
 ```
 
 # Backround Story 
 
-The data is scraped via a rest api that is provided by wikipedia for this purpose. A thin wrapper around this restful api for R is developed by Oliver Keyes in the form of the [`pageview` package](https://github.com/Ironholds/pageviews/tree/d32c629c4589765e8c8d638a8a3f315481710120) (note that this project uses the github version fixed on the commit `d32c629`). [More information about the restfull api.](https://wikimedia.org/api/rest_v1/?doc)
-
-I scrape a list of articles about several drugs, from the english wikipedia page from the first day of 2015 till the last of 2019.
+The data is scraped via a rest API that is provided by Wikipedia for this purpose. Oliver Keyes develops a thin wrapper around this restful API for R in the form of the [`pageview` package](https://github.com/Ironholds/pageviews/tree/d32c629c4589765e8c8d638a8a3f315481710120) (note that this project uses the GitHub version fixed on the commit `d32c629`). [More information about the restful API.](https://wikimedia.org/api/rest_v1/?doc)
+I scrape a list of articles about several drugs, from the English Wikipedia from the first day of 2015 till the last of 2019.
 
 ```{r get-articles}
 ```
@@ -102,10 +101,7 @@ psych_active <- c(
   "Cocaine",
   "Heroin",
   "Ecstasy",
-  "LSD",
-  "Xanax",
-  "Fentanyl",
-  "Percocet"
+  "Fentanyl"
 )
 
 start <- ymd("2015-01-01")
@@ -113,7 +109,7 @@ end <- ymd("2019-12-31")
 views <- get_articles(psych_active, start, end)
 ```
 
-Wikipedia seems to make some errors now and then (or more precisly there are sometimes issues with how articles are redirected). So I estimate the winsorized mean and standard deviation (sd) and remove (set to `NA`) values that lie beyond four (winsorized) sd above the (winsorized) mean. This estimation is pooled over all device types and agents.
+Wikipedia seems to make some errors now and then (or more precisely there are sometimes issues with how articles are redirected). So I estimate the winsorized mean and standard deviation (sd) and remove (set to `NA`) values that lie beyond four (winsorized) sd above the (winsorized) mean. This estimation is pooled overall device types and agents.
 
 ```{r remove-outliers}
 ```
@@ -122,7 +118,7 @@ Wikipedia seems to make some errors now and then (or more precisly there are som
 views <- remove_outliers(views)
 ```
 
-We have essentially three dimensions that are of interest and hence are target of the visualization: `date`, `article` and `number of views` (views from now on).
+We have three dimensions that are of interest and hence are target of the visualization: `date`, `article` and `number of views` (views from now on).
 
 ```{r}
 views %>% 
@@ -130,9 +126,9 @@ views %>%
   geom_line()
 ```
 
-This first inspection reveals two interesting problems I will focus on --- beyond that this is not too pleasing graphic overall. First the average and variability of these articles views are quite different (ever heard about Percocet?). That warrents an aproach on how to scale. Second we have a rather high frequency that may hide some interesting patterns. The general approach to adress these issues is to decompose the signal into regular patterns most notably reucuring patterns and long term trends.
+This first inspection reveals two interesting problems I will focus on --- beyond that this is not too pleasing graphics overall. First, the average and variability of these articles views are quite different (ever heard about Fentanyl?). That warrants an approach on how to scale. Second, we have a rather high frequency that may hide some exciting patterns. The general approach to address these issues is to decompose the signal into regular patterns, most notably recurring patterns and long term trends.
 
-A first step to adress these two problems is to apply a smothing filter. To that end I will convert this into a timeseries format to apply rolling functions over the date. The rolling mean and sd over 365 days is used to approximate the long term differences between the articles averages and variabilities.
+A first step to address these two problems is to apply a smoothing filter. To that end, I will convert this into a time series format to apply rolling functions over the date. The rolling mean and sd over 365 days is used to approximate the long term differences between the articles averages and variabilities.
 
 ```{r extract-trends}
 ```
@@ -150,14 +146,14 @@ views %>%
   geom_line()
 ```
 
-Substrating the roling mean and dividing by the rolling sd results into a flexible z-standartisation. So lets plot the first graphic again.
+Substrating the rolling mean and dividing by the rolling sd results into a flexible z-standardisation. So let's plot the first graphic again.
 
 ```{r}
 views %>% 
   ggplot(aes(date, views_std, group = article)) + geom_line(alpha = .3)
 ```
 
-Besides that this plot is now uninformative about any differences between the articles, it gets clear that these articles share a not so small portion of their variance across date. So I particion the date variable into repeating date patterns.
+Besides that this plot is now uninformative about any differences between the articles, it gets clear that these articles share a not so small portion of their variance across the date. So I partitioned the date variable into repeating date patterns.
 
 ```{r add-dates}
 ```
@@ -166,7 +162,7 @@ Besides that this plot is now uninformative about any differences between the ar
 views <- add_dates(views)
 ```
 
-I think the some of the higher frequency comes from the weekday.
+I think some of the higher frequency comes from differences over weekdays.
 
 ```{r extract-wday-trend}
 ```
@@ -202,7 +198,7 @@ views <- extract_year_trend(views)
 plot_year(views)
 ```
 
-After I have extracted the patterns I can remove them from the overall data and scale it back. Addtionally I create a 10 day smoothed version of the views without pattern.
+Having extracted the patterns, I can remove them from the overall data and scale it back. Additionally, I create a ten-day smoothed version of the views without a pattern.
 
 ```{r remove-pattern}
 ```
@@ -220,15 +216,14 @@ I create a plot that conveys both the raw data and the smoothed trend (smooth vi
 plot_year(views)
 ```
 
-Till now I was in the business of discerning noise and pattern related to date in views. To summarise, this was done by implementing a randome effect model with  weekday and month as randome predictors based on a non parametric timevarient standatsation method. I won't go into detail about how many assumption this procedure makes and how many cannot be assumed to hold (most notably stationarity with regard to weekday and month or zero auto correlation). Unregarding this last point I think anything goes beyond this approach in terms of more sophisticated modelling will not improve the visual perception of this timeseries.
-
-Another source of visual clutter is that we consider `r length(unique(views$article))` articles. That streches the boundary of what can be effectivly encoded in color. That is further compliceted by the fact that they are more or less simluar in shape. A possible remedy to that is to cluster the different articles into groups that are similar in their overall shape. How to define similarity in the context of timeseries is a complicated and well studies topic that is certainly beyond the scope of this project. However some important consideration may be noted. By chosing to scale the series, we deemed the differences between grand average and variability as uninteresting, which should be considered in how we operationlize similarity (because we only want similarity in thinks we consider important). Also because I have no domain knowledge about the articles under study and the long term goal of building an interactive dashboard we want a similarity definition that is parameter free. To my knowledge their is only one simularity measure that satisfies both: cross-entropy. Conceptually it may be understood as a measure that defines how much information the one timesiries caries over another, by assesing ow many bits may be saved when the one is used to compress the other and visa versa. This is formalized as the complexity of one measure plus the kulback leibler divergence between the two. While both terms of this sum are generally hard to compute some good approximation have been found. One especially suited to time series analysis is permutation distribution clustering. It takes the permutation distribution as a proxy for the required measure of complexity and the squared hellinger distance as a proxy for the kulback leiber divergence.
+Another source of visual clutter is that we consider 9 (possibly more) articles. That stretches the boundary of what can be effectively encoded in colour. That is further complicated by the fact that they are more or less similar in shape. A possible remedy is to cluster the different articles into groups that are similar in their overall shape. How to define similarity in the context of time-series is a complicated and well studies topic that is certainly beyond the scope of this project. However, some critical consideration may be noted. By choosing to scale the series, we deemed the differences between grand average and variability as uninteresting, which should be considered in how we operationalise similarity (because we only want similarity in thinks we consider essential). Also, because I have no domain knowledge about the articles under study and the long term goal of building an interactive dashboard, we want a similarity definition that is parameter-free. To my knowledge, there is only one similarity measure that satisfies both: cross-entropy. Conceptually it may be understood as a measure that defines how much information the one time series caries over another, by assessing how many bits may be saved when the one is used to compress the other and visa versa. This is formalised as the complexity of one measure plus the Kullback–Leibler divergence between the two. While both terms of this sum are generally hard to compute some good approximation, have been found. One solution uniquely suited to time series analysis is permutation distribution clustering. It takes the permutation distribution as a proxy for the required measure of complexity and the squared Hellinger distance as a proxy for the Kullback–Leibler divergence.
 
 ```{r cluster-ts}
 ```
 
 ```{r}
 views <- add_cluster(views, 3)
+clusters <- break_clusters(views)
 ```
 
 Lets plot it crudely...
@@ -237,9 +232,9 @@ Lets plot it crudely...
 plot_alltime(views) + facet_wrap(~cluster, scales = "free_y", ncol = 1)
 ```
 
-Now we have three plots representing the reuccoring week and year pattern and the full timeline grouped into clusters.
+Now we have three plots representing the reoccurring week and year pattern and the full timeline grouped into clusters.
 
-I imagine a visual arrangement where each row represents a cluster and each column a timeframe. Lets beginn with the arrangement of a single row.
+I imagine a visual arrangement where each row represents a cluster and each column a timeframe — Lets begin with the arrangement of a single row.
 
 ```{r}
 cluster1 <- filter(views, cluster == 1)
@@ -249,4 +244,47 @@ plot_wday(cluster1) +
   theme(legend.position = "none")
 ```
 
-And first I'll align the two polar plots, so they share a common y-axes.
+And first I'll align the polar plots, so they share a common y-axes.
+
+```{r plot-helper}
+```
+
+```{r align-polar}
+```
+
+```{r}
+polar <- prepare_polar(plot_wday(views),
+                       plot_year(views),
+                       clusters)
+wrap_plots(flatten(polar), design = align_polar(polar))
+```
+
+Now the full timeline...
+
+```{r align-alltime}
+```
+
+```{r}
+alltime <- prepare_alltime(plot_alltime(views), clusters)
+wrap_plots(alltime, design = align_alltime(alltime, 1, 2))
+```
+
+The colors are reused, thus creating visual relations which do not exist in the data. The color coding for this plot should optimize how well one can distinguish the different artices. A palette which varies the hue, but keeps luminance and chroma as fixed as possible is in my opinion a good fit for thath task. However it of special importance that they are as also as different as possible within each cluster. Because of the lack of a more sophisticated algorythm I scramble the order of the colors 100 times and take a sample with the highest sum of squares of hue within each group.
+
+```{r color}
+```
+
+But a legend is still missing.
+
+```{r add-legend}
+```
+
+So the final Plot is:
+
+```{r final-plot}
+```
+
+```{r}
+plot_final(views)
+```
+
