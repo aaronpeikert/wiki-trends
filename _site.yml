@@ -1,0 +1,10 @@
+name: "wiki-trends"
+title: "Wikipedia Trends"
+description: |
+  Wikipedia Trends
+output_dir: "docs"
+navbar:
+  right:
+    - icon: fab fa-github
+      href: https://github.com/aaronpeikert/wiki-trends
+output: radix::radix_article
