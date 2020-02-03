@@ -25,8 +25,8 @@
   
   
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2020-01-31"/>
-  <meta property="article:created" itemprop="dateCreated" content="2020-01-31"/>
+  <meta property="article:published" itemprop="datePublished" content="2020-02-03"/>
+  <meta property="article:created" itemprop="dateCreated" content="2020-02-03"/>
   <meta name="article:author" content="Aaron Peikert"/>
   
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -45,7 +45,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Wikipedia Trends"]},{"type":"character","attributes":{},"value":["This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Aaron Peikert"]},{"type":"character","attributes":{},"value":["https://github.com/aaronpeikert"]}]}]},{"type":"character","attributes":{},"value":["2020-01-31"]},{"type":"character","attributes":{},"value":["radix::radix_article"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Wikipedia Trends"]},{"type":"character","attributes":{},"value":["This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Aaron Peikert"]},{"type":"character","attributes":{},"value":["https://github.com/aaronpeikert"]}]}]},{"type":"character","attributes":{},"value":["2020-02-03"]},{"type":"character","attributes":{},"value":["radix::radix_article"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -1276,7 +1276,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Wikipedia Trends","description":"This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.","authors":[{"author":"Aaron Peikert","authorURL":"https://github.com/aaronpeikert","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-01-31T00:00:00.000+01:00","citationText":"Peikert, 2020"}
+{"title":"Wikipedia Trends","description":"This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.","authors":[{"author":"Aaron Peikert","authorURL":"https://github.com/aaronpeikert","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-02-03T00:00:00.000+01:00","citationText":"Peikert, 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1306,7 +1306,7 @@
 <div class="d-byline">
   Aaron Peikert <a href="https://github.com/aaronpeikert" class="uri">https://github.com/aaronpeikert</a> 
   
-<br/>2020-01-31
+<br/>2020-02-03
 </div>
 
 <div class="d-article">
@@ -1722,7 +1722,7 @@ max_color_diff &lt;- function(color, cluster, n = 100){
     colors &lt;- tibble(colors, cluster, hue = col2hue(colors)) %&gt;% 
       group_by(cluster) %&gt;%
       summarise(sshue = var(hue))
-    mean(colors$sshue)
+    mean(colors$sshue, na.rm = TRUE)
   }
   shuffle &lt;- function(x)sample(x, length(x))
   colors &lt;- replicate(n, shuffle(color), simplify = FALSE)
@@ -1777,8 +1777,12 @@ plot_final &lt;- function(views){
                     theme = theme(plot.caption = element_text(
                       face = &quot;plain&quot;,
                       colour = &quot;darkgrey&quot;,
-                      size = 10
-                    )))
+                      size = 10),
+                      plot.title = element_text(
+                        face = &quot;plain&quot;,
+                        colour = &quot;darkgrey&quot;,
+                        size = 15),
+                      plot.margin = margin(10, 10, 10, 10)))
 }</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-screen-inset">
