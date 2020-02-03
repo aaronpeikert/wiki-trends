@@ -156,6 +156,9 @@ plot_final <- function(views){
                     theme = theme(plot.caption = element_text(
                       face = "plain",
                       colour = "darkgrey",
-                      size = 10
-                    )))
+                      size = 10),
+                      plot.title = element_text(
+                        face = "plain",
+                        colour = "darkgrey",
+                        size = 15)))
 }
