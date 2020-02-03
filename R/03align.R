@@ -160,5 +160,6 @@ plot_final <- function(views){
                       plot.title = element_text(
                         face = "plain",
                         colour = "darkgrey",
-                        size = 15)))
+                        size = 15),
+                      plot.margin = margin(10, 10, 10, 10)))
 }
