@@ -105,7 +105,7 @@ max_color_diff <- function(color, cluster, n = 100){
     colors <- tibble(colors, cluster, hue = col2hue(colors)) %>% 
       group_by(cluster) %>%
       summarise(sshue = var(hue))
-    mean(colors$sshue)
+    mean(colors$sshue, na.rm = TRUE)
   }
   shuffle <- function(x)sample(x, length(x))
   colors <- replicate(n, shuffle(color), simplify = FALSE)
