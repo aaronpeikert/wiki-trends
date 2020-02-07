@@ -1,0 +1,56 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+if(!requireNamespace("pacman"))install.packages("pacman")
+pacman::p_load("fs",
+               "tidyverse",
+               "psych",
+               "lubridate",
+               "here",
+               "tsibble",
+               "pdc",
+               "cowplot",
+               "patchwork",
+               "ragg")
+pacman::p_load_gh("Ironholds/pageviews@d32c629")
+dir_walk(here("R"), source)
+```
+
+# Wiki Trends
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+You find [over here](https://aaronpeikert.github.io/wiki-trends/) the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.
+
+```{r, fig.width = 16, fig.height = 9, dpi = 300}
+articles <- c(
+  "Alcohol",
+  "Nicotine",
+  "Caffeine",
+  "Cannabis",
+  "Methamphetamine",
+  "Cocaine",
+  "Heroin",
+  "Ecstasy",
+  "Fentanyl"
+)
+get_articles(articles, ymd("2015-01-01"), ymd("2019-12-31")) %>%
+  remove_outliers() %>%
+  extract_trend() %>%
+  add_dates() %>%
+  extract_wday_trend() %>%
+  extract_year_trend() %>%
+  remove_pattern() %>%
+  add_cluster(nclust = 3) %>%
+  plot_final()
+```
+
