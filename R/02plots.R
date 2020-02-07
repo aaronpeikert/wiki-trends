@@ -25,7 +25,7 @@ theme_text <- theme(
   legend.text = element_text(
     face = "plain",
     colour = "darkgrey",
-    size = 9,
+    size = 11,
     lineheight = 0.9,
     hjust = 0.5,
     vjust = 0.5,
