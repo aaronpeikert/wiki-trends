@@ -25,8 +25,8 @@
   
   
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2020-02-03"/>
-  <meta property="article:created" itemprop="dateCreated" content="2020-02-03"/>
+  <meta property="article:published" itemprop="datePublished" content="2020-02-07"/>
+  <meta property="article:created" itemprop="dateCreated" content="2020-02-07"/>
   <meta name="article:author" content="Aaron Peikert"/>
   
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -45,7 +45,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Wikipedia Trends"]},{"type":"character","attributes":{},"value":["This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Aaron Peikert"]},{"type":"character","attributes":{},"value":["https://github.com/aaronpeikert"]}]}]},{"type":"character","attributes":{},"value":["2020-02-03"]},{"type":"character","attributes":{},"value":["radix::radix_article"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Wikipedia Trends"]},{"type":"character","attributes":{},"value":["This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Aaron Peikert"]},{"type":"character","attributes":{},"value":["https://github.com/aaronpeikert"]}]}]},{"type":"character","attributes":{},"value":["2020-02-07"]},{"type":"character","attributes":{},"value":["radix::radix_article"]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   <!--radix_placeholder_navigation_in_header-->
@@ -1276,7 +1276,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Wikipedia Trends","description":"This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.","authors":[{"author":"Aaron Peikert","authorURL":"https://github.com/aaronpeikert","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-02-03T00:00:00.000+01:00","citationText":"Peikert, 2020"}
+{"title":"Wikipedia Trends","description":"This is the endproduct of a seminar on data visualization, showing views per day of a set of wikipedia articles.","authors":[{"author":"Aaron Peikert","authorURL":"https://github.com/aaronpeikert","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-02-07T00:00:00.000+01:00","citationText":"Peikert, 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1306,13 +1306,13 @@
 <div class="d-byline">
   Aaron Peikert <a href="https://github.com/aaronpeikert" class="uri">https://github.com/aaronpeikert</a> 
   
-<br/>2020-02-03
+<br/>2020-02-07
 </div>
 
 <div class="d-article">
 <iframe src="https://aaronpeikert.shinyapps.io/wiki-trends/" class="l-screen-inset" height="800px">
 </iframe>
-<h1 id="backround-story">Backround Story</h1>
+<h1 id="background-story">Background Story</h1>
 <p>The data is scraped via a rest API that is provided by Wikipedia for this purpose. Oliver Keyes develops a thin wrapper around this restful API for R in the form of the <a href="https://github.com/Ironholds/pageviews/tree/d32c629c4589765e8c8d638a8a3f315481710120"><code>pageview</code> package</a> (note that this project uses the GitHub version fixed on the commit <code>d32c629</code>). <a href="https://wikimedia.org/api/rest_v1/?doc">More information about the restful API.</a> I scrape a list of articles about several drugs, from the English Wikipedia from the first day of 2015 till the last of 2019.</p>
 <div class="layout-chunk" data-layout="l-page">
 <pre class="r"><code>
@@ -1487,6 +1487,7 @@ plot_year &lt;- function(views) {
   breaks_year &lt;- function(x)seq(x[1], x[2], length.out = 12)
   views %&gt;%
     ggplot(aes(doy, views_year, group = article, color = article)) +
+    geom_hline(yintercept = 0, color = &quot;darkgrey&quot;, size = 0.3) +
     geom_line() +
     coord_polar() +
     theme_minimal() +
@@ -1517,6 +1518,7 @@ plot_year &lt;- function(views) {
   breaks_year &lt;- function(x)seq(x[1], x[2], length.out = 12)
   views %&gt;%
     ggplot(aes(doy, views_year, group = article, color = article)) +
+    geom_hline(yintercept = 0, color = &quot;darkgrey&quot;, size = 0.3) +
     geom_line() +
     coord_polar() +
     theme_minimal() +
@@ -1657,10 +1659,10 @@ prepare_polar &lt;- function(left, right, datas) {
           axis.title.y = element_blank())
   list(lefts = lefts, rights = rights)
 }
-align_polar &lt;- function(polar){
+align_polar &lt;- function(polar, l = 1, r = 2){
   rows &lt;- seq_along(polar$lefts)
-  pos_left &lt;- map(rows, ~area(.x, 1, .x, 1))
-  pos_right &lt;- map(rows, ~area(.x, 2, .x, 2))
+  pos_left &lt;- map(rows, ~area(.x, l, .x, l))
+  pos_right &lt;- map(rows, ~area(.x, r, .x, r))
   do.call(c, c(pos_left, pos_right))
 }</code></pre>
 </div>
@@ -1704,7 +1706,7 @@ alltime &lt;- prepare_alltime(plot_alltime(views), clusters)
 wrap_plots(alltime, design = align_alltime(alltime, 1, 2))</code></pre>
 <p><img src="index_files/figure-html5/unnamed-chunk-19-1.png" width="1950" /></p>
 </div>
-<p>The colors are reused, thus creating visual relations which do not exist in the data. The color coding for this plot should optimize how well one can distinguish the different artices. A palette which varies the hue, but keeps luminance and chroma as fixed as possible is in my opinion a good fit for thath task. However it of special importance that they are as also as different as possible within each cluster. Because of the lack of a more sophisticated algorythm I scramble the order of the colors 100 times and take a sample with the highest sum of squares of hue within each group.</p>
+<p>The colors are reused, thus creating visual relations which do not exist in the data. The color coding for this plot should optimize how well one can distinguish the different artices. A palette which varies the hue, but keeps luminance and chroma as fixed as possible is in my opinion a good fit for that task. However it is of special importance that they are as also as different as possible within each cluster. Because of the lack of a more sophisticated algorythm I scramble the order of the colors 100 times and take a sample with the highest sum of squares of hue within each group.</p>
 <div class="layout-chunk" data-layout="l-page">
 <pre class="r"><code>
 article_order &lt;- function(views){
@@ -1747,13 +1749,13 @@ add_colors &lt;- function(plots, views){
 <p>But a legend is still missing.</p>
 <div class="layout-chunk" data-layout="l-page">
 <pre class="r"><code>
-add_legend &lt;- function(plots, designs, views, which = length(plots)){
-  legend &lt;- get_legend(replace_data(views, plots[[which]]) +
-                         theme(legend.position = &quot;right&quot;))
-  plots &lt;- c(plots, list(legend))
-  nclust &lt;- length(unique(views$cluster))
-  designs &lt;- c(designs, area(1, 5, nclust, 5))
-  wrap_plots(plots, design = designs, widths = c(1, 1, 1, 1, 0.5))
+get_legends &lt;- function(plots){
+  map(plots, ~get_legend(.x + theme(legend.position = &quot;right&quot;, legend.text.align = 0, legend.justification = &quot;left&quot;)))
+}
+align_legends &lt;- function(legends, l, r){
+  rows &lt;- seq_along(legends)
+  pos &lt;- map(rows, ~area(.x, l, .x, r))
+  do.call(c, pos)
 }</code></pre>
 </div>
 <p>So the final Plot is:</p>
@@ -1765,13 +1767,16 @@ plot_final &lt;- function(views){
   alltime &lt;- plot_alltime(views)
   clusters &lt;- break_clusters(views)
   nclust &lt;- length(clusters)
-  plots &lt;- list(polar = prepare_polar(wday, year, clusters),
-                alltime = prepare_alltime(alltime, clusters))
-  designs &lt;- c(align_polar(plots$polar),
-               align_alltime(plots$alltime, 3, 4))
-  plots &lt;- c(flatten(plots$polar), plots$alltime)
+  polar &lt;- prepare_polar(wday, year, clusters)
+  alltime &lt;-  prepare_alltime(alltime, clusters)
+  plots &lt;- c(flatten(polar), alltime)
   plots &lt;- add_colors(plots, views)
-  add_legend(plots, designs, views) +
+  legends &lt;- get_legends(plots[seq_along(unique(views$cluster))])
+  designs &lt;- c(align_polar(polar, 1, 2),
+               align_alltime(alltime, 3, 3),
+               align_legends(legends, 4, 4))
+  plots &lt;- c(plots, legends)
+  wrap_plots(plots, design = designs, widths = c(1, 1, 2, 0.5)) +
     plot_annotation(title = &quot;Wikipedia Trends&quot;,
                     caption = &quot;Polar plots (left) show averaged trends in standard deviation, while cartesian plots (right) represents the raw count (shaded area +/- 1SD smothed over ten days).\nTrends shown in plots to the left are removed from plots to the right.\nRows are created by clustering articles by similarity.&quot;,
                     theme = theme(plot.caption = element_text(
@@ -1790,6 +1795,9 @@ plot_final &lt;- function(views){
 plot_final(views)</code></pre>
 <p><img src="index_files/figure-html5/unnamed-chunk-20-1.png" width="4800" /></p>
 </div>
+<h1 id="shortcomings">Shortcomings</h1>
+<p>Even after fidelling around quite a while I was unable to solve two problems, first the x-axis of the polar plots puts the first and last value on the same angle, second there is no axis title on the two y-axises which spans the whole plot (I head to revert to the caption for the information on the units). I gave up on these, because <a href="https://www.data-imaginist.com/2017/beneath-the-canvas/">“[…] <code>ggplot2</code> in many ways seems to be fueled by magic and unicorn blood […]”</a>. Another anoying thing is the speed of plotting, which is something I wouldn’t even dare to try to improve.</p>
+<p>If I were to recreate this plot I would do it in D3.js, to have finer control over such details and to enable real interactiveness, which is currently limited by beforementioned speed and principle design limitations of <code>ggplot</code>.</p>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

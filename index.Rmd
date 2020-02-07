@@ -218,7 +218,7 @@ alltime <- prepare_alltime(plot_alltime(views), clusters)
 wrap_plots(alltime, design = align_alltime(alltime, 1, 2))
 ```
 
-The colors are reused, thus creating visual relations which do not exist in the data. The color coding for this plot should optimize how well one can distinguish the different artices. A palette which varies the hue, but keeps luminance and chroma as fixed as possible is in my opinion a good fit for thath task. However it of special importance that they are as also as different as possible within each cluster. Because of the lack of a more sophisticated algorythm I scramble the order of the colors 100 times and take a sample with the highest sum of squares of hue within each group.
+The colors are reused, thus creating visual relations which do not exist in the data. The color coding for this plot should optimize how well one can distinguish the different artices. A palette which varies the hue, but keeps luminance and chroma as fixed as possible is in my opinion a good fit for that task. However it is of special importance that they are as also as different as possible within each cluster. Because of the lack of a more sophisticated algorythm I scramble the order of the colors 100 times and take a sample with the highest sum of squares of hue within each group.
 
 ```{r color}
 ```
@@ -237,3 +237,8 @@ So the final Plot is:
 plot_final(views)
 ```
 
+# Shortcomings
+
+Even after fidelling around quite a while I was unable to solve two problems, first the x-axis of the polar plots puts the first and last value on the same angle, second there is no axis title on the two y-axises which spans the whole plot (I head to revert to the caption for the information on the units). I gave up on these, because ["[...] `ggplot2` in many ways seems to be fueled by magic and unicorn blood [...]"](https://www.data-imaginist.com/2017/beneath-the-canvas/). Another anoying thing is the speed of plotting, which is something I wouldn't even dare to try to improve.
+
+If I were to recreate this plot I would do it in D3.js, to have finer control over such details and to enable real interactiveness, which is currently limited by beforementioned speed and principle design limitations of `ggplot`.

@@ -40,6 +40,7 @@ plot_wday <- function(views) {
   wdays <- c("Su", "Tu", "We", "Th", "Fr", "Sa", "Mo")
   views %>%
     ggplot(aes(wday, views_wday, group = article, color = article)) +
+    geom_hline(yintercept = 0, color = "darkgrey", size = 0.3) +
     geom_line() +
     coord_polar() +
     theme_minimal() +
@@ -55,6 +56,7 @@ plot_year <- function(views) {
   breaks_year <- function(x)seq(x[1], x[2], length.out = 12)
   views %>%
     ggplot(aes(doy, views_year, group = article, color = article)) +
+    geom_hline(yintercept = 0, color = "darkgrey", size = 0.3) +
     geom_line() +
     coord_polar() +
     theme_minimal() +

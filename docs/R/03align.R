@@ -58,10 +58,10 @@ prepare_polar <- function(left, right, datas) {
           axis.title.y = element_blank())
   list(lefts = lefts, rights = rights)
 }
-align_polar <- function(polar){
+align_polar <- function(polar, l = 1, r = 2){
   rows <- seq_along(polar$lefts)
-  pos_left <- map(rows, ~area(.x, 1, .x, 1))
-  pos_right <- map(rows, ~area(.x, 2, .x, 2))
+  pos_left <- map(rows, ~area(.x, l, .x, l))
+  pos_right <- map(rows, ~area(.x, r, .x, r))
   do.call(c, c(pos_left, pos_right))
 }
 
@@ -128,13 +128,13 @@ add_colors <- function(plots, views){
 }
 
 #----add-legend----
-add_legend <- function(plots, designs, views, which = length(plots)){
-  legend <- get_legend(replace_data(views, plots[[which]]) +
-                         theme(legend.position = "right"))
-  plots <- c(plots, list(legend))
-  nclust <- length(unique(views$cluster))
-  designs <- c(designs, area(1, 5, nclust, 5))
-  wrap_plots(plots, design = designs, widths = c(1, 1, 1, 1, 0.5))
+get_legends <- function(plots){
+  map(plots, ~get_legend(.x + theme(legend.position = "right", legend.text.align = 0, legend.justification = "left")))
+}
+align_legends <- function(legends, l, r){
+  rows <- seq_along(legends)
+  pos <- map(rows, ~area(.x, l, .x, r))
+  do.call(c, pos)
 }
 
 #----final-plot----
@@ -144,13 +144,16 @@ plot_final <- function(views){
   alltime <- plot_alltime(views)
   clusters <- break_clusters(views)
   nclust <- length(clusters)
-  plots <- list(polar = prepare_polar(wday, year, clusters),
-                alltime = prepare_alltime(alltime, clusters))
-  designs <- c(align_polar(plots$polar),
-               align_alltime(plots$alltime, 3, 4))
-  plots <- c(flatten(plots$polar), plots$alltime)
+  polar <- prepare_polar(wday, year, clusters)
+  alltime <-  prepare_alltime(alltime, clusters)
+  plots <- c(flatten(polar), alltime)
   plots <- add_colors(plots, views)
-  add_legend(plots, designs, views) +
+  legends <- get_legends(plots[seq_along(unique(views$cluster))])
+  designs <- c(align_polar(polar, 1, 2),
+               align_alltime(alltime, 3, 3),
+               align_legends(legends, 4, 4))
+  plots <- c(plots, legends)
+  wrap_plots(plots, design = designs, widths = c(1, 1, 2, 0.5)) +
     plot_annotation(title = "Wikipedia Trends",
                     caption = "Polar plots (left) show averaged trends in standard deviation, while cartesian plots (right) represents the raw count (shaded area +/- 1SD smothed over ten days).\nTrends shown in plots to the left are removed from plots to the right.\nRows are created by clustering articles by similarity.",
                     theme = theme(plot.caption = element_text(
