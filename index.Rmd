@@ -32,7 +32,7 @@ dir_walk(here("R"), knitr::read_chunk)
 
 <iframe src="https://aaronpeikert.shinyapps.io/wiki-trends/" class="l-screen-inset" height="800px"></iframe>
 
-# Backround Story 
+# Background Story
 
 The data is scraped via a rest API that is provided by Wikipedia for this purpose. Oliver Keyes develops a thin wrapper around this restful API for R in the form of the [`pageview` package](https://github.com/Ironholds/pageviews/tree/d32c629c4589765e8c8d638a8a3f315481710120) (note that this project uses the GitHub version fixed on the commit `d32c629`). [More information about the restful API.](https://wikimedia.org/api/rest_v1/?doc)
 I scrape a list of articles about several drugs, from the English Wikipedia from the first day of 2015 till the last of 2019.
