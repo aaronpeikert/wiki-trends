@@ -35,3 +35,8 @@ get_articles(articles, ymd("2015-01-01"), ymd("2019-12-31")) %>%
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+
+[![Creative Commons Attribution 2.0 Generic
+License](https://i.creativecommons.org/l/by/2.0/80x15.png) This work is
+licensed under a Creative Commons Attribution 2.0 Generic
+License.](http://creativecommons.org/licenses/by/2.0/)
